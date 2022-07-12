@@ -1,19 +1,28 @@
 import AppLayout from "../../components/AppLayout"
 import { useEffect, useState } from "react"
 import Devit from "../../components/Devit"
+import Link from 'next/link';
+import useUser from "../../hooks/useUser";
+
 
 export default function HomePage() {
   const [timeline, setTimeline] = useState([])
+  const user = useUser()
 
   useEffect(() => {
-    fetch("/api/statuses/home_timeline")
+    user && fetch("/api/statuses/home_timeline")
       .then((res) => res.json())
       .then(setTimeline)
-  }, [])
+  }, [user])
 
   return (
     <>
       <AppLayout>
+      <Link href={'/compose/tweet'}> 
+                <a>
+                    devittwee
+                </a>
+            </Link>
         <header>
           <h2>Inicio</h2>
         </header>
@@ -33,26 +42,31 @@ export default function HomePage() {
       <style jsx>{`
         header {
           align-items: center;
-          border-bottom: 1px solid #ccc;
+          border-bottom: 1px solid #eee;
           height: 49px;
           display: flex;
           position: sticky;
           top: 0;
           width: 100%;
+          background: #ffffffaa;
+          backdrop-filter: blur(5px);
+          z-index: 1;
         }
 
         h2 {
           font-size: 21px;
           font-weight: 800;
+          padding-left:15px;
         }
 
         section {
-          padding-top: 49px;
+          padding-top: 5px;
         }
 
         nav {
+          background: #fff;
           bottom: 0;
-          border-top: 1px solid #ccc;
+          border-top: 1px solid #eee;
           height: 49px;
           position: sticky;
           width: 100%;

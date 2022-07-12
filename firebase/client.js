@@ -1,6 +1,6 @@
 import { initializeApp } from "@firebase/app";
 import { getAuth, GithubAuthProvider, signInWithPopup } from "firebase/auth";
-
+import { getFirestore, collection, Timestamp, addDoc, setDoc, doc } from 'firebase/firestore/lite';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDJf1Qp6nETT_TcY41PiiddpO_UQYc0VKg",
@@ -12,19 +12,20 @@ const firebaseConfig = {
   measurementId: "G-Y4CNK3ESNN"
 };
 
+const app = initializeApp(firebaseConfig)
 
-initializeApp(firebaseConfig)
+const db = getFirestore(app);
 
 const mapUserFromFirebaseAuthToUser = (user) => {
-  const {displayName, email, photoURL } = user
-  
+  const { displayName, email, photoURL, uid } = user
+
   return {
     avatar: photoURL,
-    username: displayName,
-    email
+    userName: displayName,
+    email,
+    uid
   }
 }
-
 
 const auth = getAuth();
 export const onAuthStateChanged = (onChange) => {
@@ -40,3 +41,17 @@ export const loginWithGitHub = () => {
   githubProvider.setCustomParameters(firebaseConfig);
   return signInWithPopup(auth, githubProvider);
 };
+
+export const addDevit = async ({userID, avatar, userName, content}) => {
+
+   return await addDoc(collection(db, "devits"), {
+    avatar,
+    content,
+    userID,
+    userName,
+    createdAt: Timestamp.fromDate(new Date()),
+    likesCount: 0,
+    sharedCount: 0,
+    });
+
+}
