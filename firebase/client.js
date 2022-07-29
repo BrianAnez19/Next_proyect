@@ -1,6 +1,10 @@
 import { initializeApp } from "@firebase/app";
 import { getAuth, GithubAuthProvider, signInWithPopup } from "firebase/auth";
-import { getFirestore, collection, Timestamp, addDoc, setDoc, doc } from 'firebase/firestore/lite';
+import {
+  getFirestore, collection,
+  Timestamp, addDoc, query,
+  getDocs, setDoc, doc
+} from 'firebase/firestore/lite';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDJf1Qp6nETT_TcY41PiiddpO_UQYc0VKg",
@@ -17,7 +21,12 @@ const app = initializeApp(firebaseConfig)
 const db = getFirestore(app);
 
 const mapUserFromFirebaseAuthToUser = (user) => {
-  const { displayName, email, photoURL, uid } = user
+  const { email, photoURL, uid } = user
+
+  const displayName = user.providerData.map(us => {
+    const { displayName } = us
+    return displayName
+  })
 
   return {
     avatar: photoURL,
@@ -42,9 +51,9 @@ export const loginWithGitHub = () => {
   return signInWithPopup(auth, githubProvider);
 };
 
-export const addDevit = async ({userID, avatar, userName, content}) => {
+export const addDevit = async ({ userID, avatar, userName, content }) => {
 
-   return await addDoc(collection(db, "devits"), {
+  return await addDoc(collection(db, "devits"), {
     avatar,
     content,
     userID,
@@ -52,6 +61,31 @@ export const addDevit = async ({userID, avatar, userName, content}) => {
     createdAt: Timestamp.fromDate(new Date()),
     likesCount: 0,
     sharedCount: 0,
-    });
+  });
 
 }
+
+export const fetchLatestDevits = async () => {
+  const q = query(collection(db, "devits"));
+  const querySnap = await getDocs(q);
+  const data = querySnap.docs.map((doc) => {
+    const data = doc.data()
+    const id = doc.id
+    const { createdAt } = data
+
+    // formateo directo y manual a modo fecha
+    // const date = new Date(createdAt.seconds * 1000)
+    // const normalizedCreatedAt = new Intl.DateTimeFormat("es-ES").format(
+    //   date)
+      return {
+        ...data,
+        id,
+        // createdAt: normalizedCreatedAt,
+        createdAt: +createdAt.toDate(),
+
+      };
+
+  })
+  return data;
+};
+ 

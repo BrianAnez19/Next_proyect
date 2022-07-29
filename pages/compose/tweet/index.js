@@ -39,7 +39,7 @@ export default function ComposeTweet() {
         })
     }
 
-    const isButtonDisabled = message.length === 0 &&
+    const isButtonDisabled = message.length === 0 ||
         status === COMPOSE_STATUS.LOADING
 
     return (

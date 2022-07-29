@@ -1,15 +1,20 @@
 import Avatar from "../../components/Avatar"
+import useTimeAgo from "../../hooks/useTimeAgo"
 
-export default function Devit({ avatar, username, message, id }) {
+
+export default function Devit({ avatar, userName, createdAt, content, id }) {
+  const timeago = useTimeAgo(createdAt)
   return (
     <>
       <article>
         <div>
-          <Avatar alt={username} src={avatar} />
+          <Avatar alt={userName} src={avatar} />
         </div>
         <section>
-          <strong>{username}</strong>
-          <p>{message}</p>
+          <strong>{userName}</strong>
+          <span> . </span>
+          <date>{timeago}</date>
+          <p>{content}</p>
         </section>
       </article>
       <style jsx>{`
@@ -26,6 +31,11 @@ export default function Devit({ avatar, username, message, id }) {
         p {
           line-height: 1.3125;
           margin: 0;
+        }
+
+        date{
+          color: #555;
+          font-size: 14px; 
         }
       `}</style>
     </>

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import Devit from "../../components/Devit"
 import Link from 'next/link';
 import useUser from "../../hooks/useUser";
+import { fetchLatestDevits } from "../../firebase/client";
 
 
 export default function HomePage() {
@@ -10,30 +11,36 @@ export default function HomePage() {
   const user = useUser()
 
   useEffect(() => {
-    user && fetch("/api/statuses/home_timeline")
-      .then((res) => res.json())
+    user && fetchLatestDevits()
       .then(setTimeline)
   }, [user])
 
   return (
     <>
       <AppLayout>
-      <Link href={'/compose/tweet'}> 
-                <a>
-                    devittwee
-                </a>
-            </Link>
+        <Link href={'/compose/tweet'}>
+          <a>
+            devittwee
+          </a>
+        </Link>
         <header>
           <h2>Inicio</h2>
         </header>
         <section>
-          {timeline.map(({ id, username, avatar, message }) => (
+          {timeline.map((
+            { id, userID, userName, avatar,
+              content, createdAt, likesCount,
+              sharedCount }) => (
             <Devit
-              avatar={avatar}
               id={id}
               key={id}
-              message={message}
-              username={username}
+              userID={userID}
+              avatar={avatar}
+              userName={ userName}
+              content={content}
+              createdAt={createdAt}
+              likesCount={likesCount}
+              sharedCount={sharedCount}
             />
           ))}
         </section>
